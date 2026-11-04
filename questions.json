@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1793366072165,
+    "subject": "python",
+    "unit": "1",
+    "question": "5"
+  },
+  {
+    "id": 1793375981658,
+    "subject": "python",
+    "unit": "1",
+    "question": "What is python? Explain its features."
+  },
+  {
+    "id": 1793376040685,
+    "subject": "python",
+    "unit": "1",
+    "question": "Explain data types in python with example."
+  },
+  {
+    "id": 1793376093170,
+    "subject": "python",
+    "unit": "2",
+    "question": "What is loop? Explain for and while loop."
+  },
+  {
+    "id": 1793376143917,
+    "subject": "python",
+    "unit": "2",
+    "question": "What is functions? Explain types of functions."
+  },
+  {
+    "id": 1793376184451,
+    "subject": "python",
+    "unit": "3",
+    "question": "Explain OOPs concept in python."
+  }
+]

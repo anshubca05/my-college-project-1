@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Signup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:#5b6cf0;font-family:sans-serif}
+.box{background:white;width:350px;padding:30px 25px;border-radius:16px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.15)}
+.box h2{margin:5px 0 25px 0;font-size:22px;color:#2f3542}
+.input-wrap{position:relative; margin:14px 0;}
+.box input{
+  width:100%; 
+  padding:12px 35px 12px 12px; 
+  border:1.5px solid #b2bec3; /* <- Ye line se box dark ho jayega */
+  border-radius:8px; /* halka gol */
+  outline:none; 
+  font-size:14px; 
+  box-sizing:border-box;
+  background:#fcfcfc;
+}
+.box input:focus{
+  border:1.5px solid #6c7ce0; /* focus pe blue ho jayega */
+  background:white;
+}
+.eye{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  cursor:pointer; font-size:18px;
+}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;color:white;font-weight:600;cursor:pointer;margin-top:12px;font-size:14px}
+.login{background:#6c7ce0}
+.signup{background:#00b5ad}
+#msg{color:#ff6b6b;font-size:13px;margin-top:12px;min-height:16px}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🎓 Create Account</h2>
+
+<input id="username" placeholder="New Username">
+
+<div class="input-wrap">
+  <input id="password" type="password" placeholder="New Password">
+  <span class="eye" onclick="toggle()">👁️</span>
+</div>
+
+<button class="btn signup" onclick="signup()">Signup</button>
+<button class="btn login" onclick="location.href='login.html'">Already User? Login</button>
+<div id="msg"></div>
+</div>
+
+<script>
+function toggle(){
+  let p = document.getElementById('password');
+  let e = document.querySelector('.eye');
+  if(p.type === 'password'){
+    p.type = 'text';
+    e.innerText = '🙈';
+  } else {
+    p.type = 'password';
+    e.innerText = '👁️';
+  }
+}
+
+async function signup(){
+ let u=username.value.trim(), p=password.value.trim();
+ if(!u||!p){msg.innerText='Username & Password bharo';return}
+ let res=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+ let data=await res.json();
+ if(data.success){msg.style.color='green';msg.innerText='Ban gaya! Login karo';setTimeout(()=>location.href='login.html',1000)}else{msg.innerText=data.msg}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Paper Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:#5b6cf0;font-family:sans-serif}
+.box{background:white;width:350px;padding:30px 25px;border-radius:16px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.15)}
+.box h2{margin:5px 0 25px 0;font-size:22px;color:#2f3542}
+.input-wrap{position:relative; margin:14px 0;}
+.box input{
+  width:100%; 
+  padding:12px 35px 12px 12px; 
+  border:1.5px solid #b2bec3; /* <- Outline ab dikhegi */
+  border-radius:8px; 
+  outline:none; 
+  font-size:14px; 
+  box-sizing:border-box;
+  background:#fcfcfc;
+}
+.box input:focus{
+  border:1.5px solid #6c7ce0;
+  background:white;
+}
+.eye{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  cursor:pointer; font-size:18px; user-select:none;
+}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;color:white;font-weight:600;cursor:pointer;margin-top:12px;font-size:14px}
+.login{background:#6c7ce0}
+.signup{background:#00b5ad}
+#msg{color:#ff6b6b;font-size:13px;margin-top:12px;min-height:16px}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🎓 Smart Paper Generator</h2>
+
+<div class="input-wrap">
+  <input id="username" placeholder="Username">
+</div>
+
+<div class="input-wrap">
+  <input id="password" type="password" placeholder="Password">
+  <span class="eye" onclick="toggle()">👁️</span>
+</div>
+
+<button class="btn login" onclick="login()">Login</button>
+<button class="btn signup" onclick="location.href='signup.html'">New User? Signup</button>
+
+<div id="msg"></div>
+</div>
+
+<script>
+function toggle(){
+  let p = document.getElementById('password');
+  let e = document.querySelector('.eye');
+  if(p.type === 'password'){
+    p.type = 'text';
+    e.innerText = '🙈';
+  } else {
+    p.type = 'password';
+    e.innerText = '👁️';
+  }
+}
+
+async function login(){
+  let u=username.value.trim(), p=password.value.trim();
+  if(!u||!p){msg.innerText='Username & Password bharo'; return}
+  let res=await fetch('/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,password:p})});
+  let data=await res.json();
+  if(data.success){
+    localStorage.setItem('username', data.username);
+    location.href='dashboard.html';
+  }else{
+    msg.innerText=data.msg;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html><html><head><title>Dashboard</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+body{font-family:'Segoe UI',sans-serif;background:#f1f2f6;margin:0;padding:15px}
+.navbar{background:white;padding:14px 20px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.06);border:1.5px solid #dfe6e9}
+.card{background:white;padding:20px;border-radius:10px;margin-top:15px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border:1.5px solid #dfe6e9}
+.card h3{margin:0 0 15px 0;color:#2d3436;font-size:18px;border-bottom:2px solid #6c5ce7;padding-bottom:8px}
+input{width:100%;padding:10px 12px;margin:6px 0;border:1.5px solid #a4b0be;border-radius:6px;box-sizing:border-box;font-size:13px;outline:none;background:white}
+.two-col{display:flex;gap:12px}
+button{padding:8px 16px;border:none;border-radius:5px;cursor:pointer;font-weight:600;font-size:13px}
+.q-box{border:1.5px solid #a4b0be;padding:12px;border-radius:8px;margin:12px 0;background:#fafafa}
+.q-header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.q-title{flex:1}
+.marks-box{width:90px !important;margin:0 !important}
+.del-btn{background:#ff3e4d;color:white}
+.sub-row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.sub-input{flex:1}
+.add-sub-btn{background:#e9eaf6;color:#6c5ce7;width:100%;margin-top:8px;border:1.5px dashed #6c5ce7}
+.center-msg{text-align:center;padding:12px;color:#636e72;font-size:14px}
+</style></head><body>
+
+<div class="navbar">
+<h2 style="font-size:26px;margin:0;font-weight:800">🎓 Smart Paper Generator</h2>
+<div><b id="userName"></b> <button onclick="logout()" style="background:#ff7675;color:white;margin-left:10px">Logout</button></div>
+</div>
+
+<div class="card">
+<h3>📄 Generate Paper</h3>
+<input id="college" value="DISHA BHARTI COLLEGE OF MANAGEMENT AND EDUCATION, SRE">
+<!-- NAYA BOX 1: Exam Title -->
+<input id="examTitle" value="FIRST SESSIONAL EXAMINATION - 2026">
+<div class="two-col"><input id="class" value="BCA - Semester V"><input id="subject" value="Java Programming"></div>
+<div class="two-col"><input id="time" value="2 hours"><input id="maxMarks" value="60"></div>
+<div id="questionsContainer"></div>
+<div style="display:flex;gap:12px;margin-top:18px">
+<button onclick="addQuestion()" style="background:#00b894;color:white;flex:1;padding:12px">+ Add Question</button>
+<!-- NAYA BUTTON 2: New Paper -->
+<button onclick="newPaper()" style="background:#fdcb6e;color:#2d3436;flex:1;padding:12px">🔄 New Paper</button>
+<button onclick="generatePaper()" style="background:#6c5ce7;color:white;flex:1;padding:12px">Generate PDF</button>
+</div>
+<p id="genMsg"></p>
+</div>
+
+<div class="card"><h3>📚 My Saved Papers - <span id="myUser"></span></h3><div id="myPapersList"></div></div>
+<div class="card"><h3>🗑️ Recycle Bin</h3><div id="recycleList" style="background:#fff3cd;padding:12px;border-radius:6px;border:1.5px solid #ffeaa7"></div></div>
+
+<script>
+let username = localStorage.getItem('username');
+if(!username) location.href='login.html';
+userName.innerText=username; myUser.innerText=username;
+let qCount=0;
+const letters=["a","b","c","d","e","f","g","h","i","j"];
+function addQuestion(){
+  qCount++;
+  let div=document.createElement('div'); div.className='q-box'; div.id='q_'+qCount;
+  div.innerHTML=`<div class="q-header"><span class="q-label" style="font-weight:700;min-width:30px">Q${document.querySelectorAll('.q-box').length+1}.</span><input id="qTitle_${qCount}" class="q-title" placeholder="Heading"><input id="marks_${qCount}" class="marks-box" placeholder="Marks"><button onclick="deleteQuestion('q_${qCount}')" class="del-btn">Delete</button></div><div id="subs_${qCount}"></div><button onclick="addSub('${qCount}')" class="add-sub-btn">+ Add a) b) c) Option</button>`;
+  questionsContainer.appendChild(div); renumberQuestions();
+}
+function deleteQuestion(id){ document.getElementById(id)?.remove(); renumberQuestions(); }
+function renumberQuestions(){ document.querySelectorAll('.q-box').forEach((box,i)=>{ box.querySelector('.q-label').innerText=`Q${i+1}.`; }); }
+function addSub(qId){
+  let c=document.getElementById('subs_'+qId);
+  let row=document.createElement('div'); row.className='sub-row';
+  row.innerHTML=`<span>${letters[c.children.length]||c.children.length+1})</span><input class="sub-input"><button onclick="this.parentElement.remove(); renumberSubs('${qId}')" style="background:#f1f2f6;padding:5px 8px">X</button>`;
+  c.appendChild(row);
+}
+function renumberSubs(qId){ [...document.getElementById('subs_'+qId).children].forEach((r,i)=>{ r.querySelector('span').innerText=(letters[i]||i+1)+')'; }); }
+
+// NAYA FUNCTION: New Paper
+function newPaper(){
+  if(!confirm("Naya paper start karna hai? Purana likha hua hat jayega.")) return;
+  document.getElementById('examTitle').value = "FIRST SESSIONAL EXAMINATION - 2026";
+  document.getElementById('class').value = "BCA - Semester V";
+  document.getElementById('subject').value = "Java Programming";
+  document.getElementById('time').value = "2 hours";
+  document.getElementById('maxMarks').value = "60";
+  document.getElementById('questionsContainer').innerHTML = "";
+  qCount = 0;
+  addQuestion(); addQuestion();
+  genMsg.innerText = "";
+}
+
+async function generatePaper(){
+  let finalQuestions=[];
+  document.querySelectorAll('.q-box').forEach(box=>{
+    let qId=box.id.split('_')[1];
+    let title=document.getElementById('qTitle_'+qId)?.value||"", marks=document.getElementById('marks_'+qId)?.value||"", subs=[];
+    [...document.getElementById('subs_'+qId).children].forEach(r=>{ let v=r.querySelector('.sub-input').value; if(v.trim()!="") subs.push(v); });
+    if(title||subs.length>0) finalQuestions.push({title,marks,subs});
+  });
+  genMsg.innerText='Generating...';
+  let r=await fetch('/api/generate-paper',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,college:document.getElementById('college').value,examTitle:document.getElementById('examTitle').value,subject:document.getElementById('subject').value,className:document.getElementById('class').value,time:document.getElementById('time').value,maxMarks:document.getElementById('maxMarks').value,questions:finalQuestions})});
+  let d=await r.json(); if(d.success){ genMsg.innerHTML=`<a href="${d.file}" target="_blank" style="color:#6c5ce7;font-weight:bold">📄 View Paper</a>`; loadMyPapers(); }
+}
+async function loadMyPapers(){
+  let res=await fetch('/api/my-papers/'+username); let papers=await res.json();
+  if(papers.length==0) myPapersList.innerHTML=`<div class="center-msg">No papers yet</div>`;
+  else myPapersList.innerHTML=papers.map(p=>`<div style="border-bottom:1px solid #eee;padding:10px 0;display:flex;justify-content:space-between"><div><b>${p.subject}</b><br><small>${p.date}</small></div><div><a href="${p.file}" target="_blank">View</a> <button onclick="deletePaper('${p.file}')">🗑️</button></div></div>`).join('');
+  loadRecycleBin();
+}
+async function loadRecycleBin(){
+  let res=await fetch('/api/recycle-bin/'+username); let papers=await res.json();
+  if(papers.length==0) recycleList.innerHTML=`<div class="center-msg">✨ Bin clean! Full safai hai 🧹😂</div>`;
+  else recycleList.innerHTML=papers.map(p=>`<div style="border-bottom:1px dashed #ccc;padding:8px 0;display:flex;justify-content:space-between"><div><b>${p.subject}</b><br><small>${p.deletedAt}</small></div><div><button onclick="restorePaper('${p.file}')">Restore</button><button onclick="permanentDelete('${p.file}')">Forever</button></div></div>`).join('');
+}
+async function deletePaper(file){ await fetch('/api/delete-paper',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,file})}); loadMyPapers(); }
+async function restorePaper(file){ await fetch('/api/restore-paper',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,file})}); loadMyPapers(); }
+async function permanentDelete(file){ if(!confirm("Pakka delete?")) return; await fetch('/api/permanent-delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,file})}); loadMyPapers(); }
+function logout(){ localStorage.clear(); location.href='login.html'; }
+addQuestion(); addQuestion(); loadMyPapers();
+</script></body></html>
