@@ -6,6 +6,9 @@ const PDFDocument = require('pdfkit');
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 
 // Files check
 if (!fs.existsSync('users.json')) fs.writeFileSync('users.json', '[]');
