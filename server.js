@@ -146,4 +146,4 @@ app.post('/api/permanent-delete', (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000/login.html'));
+app.listen(process.env.PORT || 3000, () => console.log('Server running'));
